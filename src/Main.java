@@ -34,10 +34,18 @@ public class Main {
         }
 
         this.playerPos = new int[]{3, 4};
-        this.deplacerJoueur(this.playerPos[0], this.playerPos[1]);
-        this.board[3][3] = CRATE;
-        this.board[2][3] = GOAL;
+        this.setCase(this.playerPos[0], this.playerPos[1], PLAYER);
 
+        this.setCase(3, 3, CRATE);
+        this.setCase(3, 2, GOAL);
+    }
+
+    public void setCase(int x, int y, char c) {
+        this.board[y][x] = c;
+    }
+
+    public char getCase(int x, int y) {
+        return this.board[y][x];
     }
 
     public void afficherGrille() {
@@ -50,22 +58,44 @@ public class Main {
     }
 
     public boolean deplacementValide(int x, int y) {
-        return this.board[y][x] != WALL;
+        return this.getCase(x, y) != WALL;
     }
 
     public void deplacerJoueur(int x, int y) {
-        if (!deplacementValide(x, y)) {
+        int destX = this.playerPos[0] + x;
+        int destY = this.playerPos[1] + y;
+
+        if (!deplacementValide(destX, destY)) {
             return;
         }
-        this.board[this.playerPos[1]][this.playerPos[0]] = EMPTY;
-        this.playerPos[0] = x;
-        this.playerPos[1] = y;
-        this.board[this.playerPos[1]][this.playerPos[0]] = PLAYER;
+
+        if (this.getCase(destX, destY) == CRATE && !this.deplacerCaisse(destX + x, destY + y)) {
+            return;
+        }
+
+        this.setCase(this.playerPos[0], this.playerPos[1], EMPTY);
+        this.playerPos[0] = destX;
+        this.playerPos[1] = destY;
+        this.setCase(this.playerPos[0], this.playerPos[1], PLAYER);
+    }
+
+    public boolean deplacerCaisse(int destX, int destY) {
+        if (this.peutPousser(destX, destY)) {
+            //TODO: Remplacer la case précédente de la caisse en EMPTY (Pas obligatoire car le joueur prend la place de la caisse, selon la seule mécanique du jeu : il pousse la caisse
+            this.setCase(destX, destY, CRATE);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean peutPousser(int destCrateX, int destCrateY) {
+        //TODO vérifier hors map
+        return this.getCase(destCrateX, destCrateY) == EMPTY || this.getCase(destCrateX, destCrateY) == GOAL;
     }
 
     public void jouer() {
         //scanner, affiche les commandes, la grille
-        System.out.println("Voici les commandes : z,q,s,d, x");
+        System.out.println("Voici les commandes : **q**");
         this.afficherGrille();
         System.out.print("Votre commande : ");
         Scanner scanner = new Scanner(System.in);
@@ -77,16 +107,16 @@ public class Main {
         }
         switch (command) {
             case "z":
-                this.deplacerJoueur(this.playerPos[0], this.playerPos[1]-1);
-                break;
-            case "q":
-                this.deplacerJoueur(this.playerPos[0]-1, this.playerPos[1]);
+                this.deplacerJoueur(0, -1);
                 break;
             case "s":
-                this.deplacerJoueur(this.playerPos[0], this.playerPos[1]+1);
+                this.deplacerJoueur(0, 1);
+                break;
+            case "q":
+                this.deplacerJoueur(-1, 0);
                 break;
             case "d":
-                this.deplacerJoueur(this.playerPos[0]+1, this.playerPos[1]);
+                this.deplacerJoueur(1, 0);
                 break;
             case "x":
                 System.out.println("Quitter");
@@ -133,6 +163,5 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main(7, 8);
         main.startGame();
-        Scanner scan = new Scanner(System.in);//.useDelimiter("\n");
     }
 }
