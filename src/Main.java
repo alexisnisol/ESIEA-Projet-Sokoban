@@ -19,14 +19,18 @@ public class Main {
     public int nbMouvements;
     private char[][] board;
     private int[] playerPos;
+    private int rows;
+    private int cols;
 
     public Main(int rows, int cols) {
         this.initBoard(rows, cols);
     }
 
     private void initBoard(int rows, int cols) {
-        this.board = new char[rows][cols];
+        this.board = new char[rows][cols];  
         this.nbMouvements = 0;
+        this.rows = rows;
+        this.cols = cols;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -118,6 +122,35 @@ public class Main {
         System.out.println("Nombre de mouvements : " + this.nbMouvements + "\n");
 
         return true;
+    }
+
+
+    // Résolution automatique
+
+    public String encoder(char[][] tab) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
+                sb.append(tab[i][j]);
+            }
+        }
+        return sb.toString();
+    }
+
+    public char[][] decoder(String tabApplati) {
+        char[][] snapshotTab = new char[this.rows][this.cols];
+        int indice = 0;
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
+                snapshotTab[i][j] = tabApplati.charAt(indice);
+                indice ++;
+            }
+        }
+        return snapshotTab;
+    }
+
+    public char[] resolveBFS() {
+        //TODO
     }
 
     public static Scanner scanner = new Scanner(System.in);
