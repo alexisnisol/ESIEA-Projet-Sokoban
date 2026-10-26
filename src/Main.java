@@ -2,9 +2,6 @@ import java.util.Scanner;
 
 public class Main {
 
-    private final char[][] board;
-    private int[] playerPos;
-
     /**
      * CONSTANTES
      */
@@ -14,6 +11,14 @@ public class Main {
     public final static char CRATE = '$';
     public final static char GOAL = '.';
     public final static char VALIDATE_CRATE = '*';
+
+
+    /**
+     * VARIABLES JEU
+     */
+    public static int nbMouvements = 0;
+    private final char[][] board;
+    private int[] playerPos;
 
     public Main(int rows, int cols) {
         this.board = new char[rows][cols];
@@ -57,19 +62,20 @@ public class Main {
         }
     }
 
-    public boolean deplacementValide(int x, int y) {
-        return this.getCase(x, y) != WALL;
+    public boolean deplacementValide(char getCase) {
+        return getCase != WALL && getCase != VALIDATE_CRATE;
     }
 
     public void deplacerJoueur(int x, int y) {
         int destX = this.playerPos[0] + x;
         int destY = this.playerPos[1] + y;
 
-        if (!deplacementValide(destX, destY)) {
+        char getCase = this.getCase(destX, destY);
+
+        if (!deplacementValide(getCase)) {
             return;
         }
-
-        if (this.getCase(destX, destY) == CRATE && !this.deplacerCaisse(destX + x, destY + y)) {
+        if (getCase == CRATE && !this.deplacerCaisse(destX + x, destY + y)) {
             return;
         }
 
@@ -77,28 +83,57 @@ public class Main {
         this.playerPos[0] = destX;
         this.playerPos[1] = destY;
         this.setCase(this.playerPos[0], this.playerPos[1], PLAYER);
+        Main.nbMouvements++;
     }
 
     public boolean deplacerCaisse(int destX, int destY) {
-        if (this.peutPousser(destX, destY)) {
-            //TODO: Remplacer la case précédente de la caisse en EMPTY (Pas obligatoire car le joueur prend la place de la caisse, selon la seule mécanique du jeu : il pousse la caisse
-            this.setCase(destX, destY, CRATE);
+        char getCase = this.getCase(destX, destY);
+        if (this.peutPousser(getCase)) {
+            if (getCase == GOAL) {
+                this.setCase(destX, destY, VALIDATE_CRATE);
+            } else {
+                //TODO: Remplacer la case précédente de la caisse en EMPTY (Pas obligatoire car le joueur prend la place de la caisse, selon la seule mécanique du jeu : il pousse la caisse
+                this.setCase(destX, destY, CRATE);
+            }
             return true;
         }
         return false;
     }
 
-    public boolean peutPousser(int destCrateX, int destCrateY) {
-        //TODO vérifier hors map
-        return this.getCase(destCrateX, destCrateY) == EMPTY || this.getCase(destCrateX, destCrateY) == GOAL;
+    public boolean peutPousser(char getCase) {
+        //TODO vérifier hors map?
+        return getCase == EMPTY || getCase == GOAL;
     }
+
+    public boolean verifierVictoire() {
+        for (char[] chars : this.board) {
+            for (char c : chars) {
+                if (c == GOAL) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static Scanner scanner = new Scanner(System.in);
 
     public void jouer() {
         //scanner, affiche les commandes, la grille
-        System.out.println("Voici les commandes : **q**");
+
+        System.out.println("Voici les commandes : z, q, s, d, x");
         this.afficherGrille();
+
+        if(verifierVictoire()) {
+            System.out.println("Victoire !");
+            System.out.println("Nombre de mouvements : " + Main.nbMouvements + "\n");
+            System.out.print("Entrer pour continuer...");
+            scanner.nextLine();
+            return;
+        }
+
         System.out.print("Votre commande : ");
-        Scanner scanner = new Scanner(System.in);
+
         String command = scanner.nextLine();
         if (command.length() > 1) {
             System.out.println("Invalide.");
@@ -130,17 +165,26 @@ public class Main {
 
 
     public void startGame() {
-        menuAffichage("SOKOBAN JAVA", new String[]{"1. Nouvelle partie", "2. Choisir un niveau"});
+        menuAffichage("SOKOBAN JAVA", new String[]{"1. Nouvelle partie", "2. Choisir un niveau", "6. Quitter"});
 
         Scanner scanner = new Scanner(System.in);
-        int command = scanner.nextInt();
-        switch (command) {
-            case 1:
-                jouer();
-                break;
-            case 2:
-                break;
+        if (scanner.hasNextInt()) {
+            int command = scanner.nextInt();
+            switch (command) {
+                case 1:
+                    Main.nbMouvements = 0;
+                    jouer();
+                    break;
+                case 6:
+                    return;
+                default:
+                    System.out.println("Commande invalide.");
+                    break;
+            }
+        } else {
+            System.out.println("Commande invalide.");
         }
+        startGame();
     }
 
     public static void menuAffichage(String title, String[] options){
