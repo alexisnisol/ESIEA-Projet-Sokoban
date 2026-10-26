@@ -16,18 +16,18 @@ public class Main {
     /**
      * VARIABLES JEU
      */
-    public static int nbMouvements = 0;
-    private final char[][] board;
+    public int nbMouvements;
+    private char[][] board;
     private int[] playerPos;
 
     public Main(int rows, int cols) {
-        this.board = new char[rows][cols];
-        this.initBoard();
+        this.initBoard(rows, cols);
     }
 
-    private void initBoard() {
-        int rows = this.board.length;
-        int cols = this.board[0].length;
+    private void initBoard(int rows, int cols) {
+        this.board = new char[rows][cols];
+        this.nbMouvements = 0;
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (i == 0 || j == 0 || i == rows - 1 || j == cols - 1) {
@@ -83,7 +83,7 @@ public class Main {
         this.playerPos[0] = destX;
         this.playerPos[1] = destY;
         this.setCase(this.playerPos[0], this.playerPos[1], PLAYER);
-        Main.nbMouvements++;
+        this.nbMouvements++;
     }
 
     public boolean deplacerCaisse(int destX, int destY) {
@@ -105,7 +105,7 @@ public class Main {
         return getCase == EMPTY || getCase == GOAL;
     }
 
-    public boolean verifierVictoire() {
+    public boolean partieTerminee() {
         for (char[] chars : this.board) {
             for (char c : chars) {
                 if (c == GOAL) {
@@ -113,6 +113,10 @@ public class Main {
                 }
             }
         }
+
+        System.out.println("Victoire !");
+        System.out.println("Nombre de mouvements : " + this.nbMouvements + "\n");
+
         return true;
     }
 
@@ -124,9 +128,7 @@ public class Main {
         System.out.println("Voici les commandes : z, q, s, d, x");
         this.afficherGrille();
 
-        if(verifierVictoire()) {
-            System.out.println("Victoire !");
-            System.out.println("Nombre de mouvements : " + Main.nbMouvements + "\n");
+        if(partieTerminee()) {
             System.out.print("Entrer pour continuer...");
             scanner.nextLine();
             return;
@@ -172,7 +174,7 @@ public class Main {
             int command = scanner.nextInt();
             switch (command) {
                 case 1:
-                    Main.nbMouvements = 0;
+                    this.initBoard(7, 8);
                     jouer();
                     break;
                 case 6:
@@ -209,3 +211,5 @@ public class Main {
         main.startGame();
     }
 }
+
+//TODO: Faire les NIVEAUX
