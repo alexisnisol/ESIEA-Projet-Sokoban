@@ -12,7 +12,6 @@ public class Main {
     public final static char GOAL = '.';
     public final static char VALIDATE_CRATE = '*';
 
-
     /**
      * VARIABLES JEU
      */
@@ -43,6 +42,20 @@ public class Main {
 
         this.setCase(3, 3, CRATE);
         this.setCase(3, 2, GOAL);
+
+        this.identifierObjectifs();
+    }
+
+    public void identifierObjectifs() {
+        char c;
+        for (int i = 0; i < this.board.length; i++) {
+            for (int j = 0; j < this.board[i].length; j++) {
+                c = this.board[i][j];
+                if (c == GOAL) {
+                    //this.goalPos[i][j] = false;
+                }
+            }
+        }
     }
 
     public void setCase(int x, int y, char c) {
@@ -78,7 +91,7 @@ public class Main {
         if (getCase == CRATE && !this.deplacerCaisse(destX + x, destY + y)) {
             return;
         }
-
+        
         this.setCase(this.playerPos[0], this.playerPos[1], EMPTY);
         this.playerPos[0] = destX;
         this.playerPos[1] = destY;
@@ -91,6 +104,7 @@ public class Main {
         if (this.peutPousser(getCase)) {
             if (getCase == GOAL) {
                 this.setCase(destX, destY, VALIDATE_CRATE);
+                //this.goalPos[destX][destY] = true;
             } else {
                 //TODO: Remplacer la case précédente de la caisse en EMPTY (Pas obligatoire car le joueur prend la place de la caisse, selon la seule mécanique du jeu : il pousse la caisse
                 this.setCase(destX, destY, CRATE);
