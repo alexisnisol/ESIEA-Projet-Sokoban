@@ -165,6 +165,7 @@ public class Main {
         if (this.peutPousser(getCase)) {
             if (getCase == GOAL) {
                 this.setCase(destX, destY, VALIDATE_CRATE);
+                //this.goalPos[destX][destY] = true;
             } else {
                 //TODO: Remplacer la case précédente de la caisse en EMPTY (Pas obligatoire car le joueur prend la place de la caisse, selon la seule mécanique du jeu : il pousse la caisse
                 this.setCase(destX, destY, CRATE);
